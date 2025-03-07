@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt, FaDownload } from "react-icons/fa";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
 
 
 

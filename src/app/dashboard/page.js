@@ -23,7 +23,17 @@ const images = [
   { src: "/CMpic.png", title: "CII Young Indians Conference" },
   { src: "/F3.png", title: "CII Young Indians Conference" },
   { src: "/F4.png", title: "CII Young Indians Conference" },
-  { src: "/CMpic.png", title: "CII Young Indians Conference" }
+  { src: "/CMpic.png", title: "CII Young Indians Conference" },
+  { src: "/F4.png", title: "CII Young Indians Conference" },
+  { src: "/CMpic.png", title: "CII Young Indians Conference" },
+  { src: "/F4.png", title: "CII Young Indians Conference" },
+  { src: "/F3.png", title: "CII Young Indians Conference" },
+  { src: "/F3.png", title: "CII Young Indians Conference" },
+  { src: "/F4.png", title: "CII Young Indians Conference" },
+  { src: "/CMpic.png", title: "CII Young Indians Conference" },
+  { src: "/F3.png", title: "CII Young Indians Conference" },
+  { src: "/F4.png", title: "CII Young Indians Conference" },
+  { src: "/CMpic.png", title: "CII Young Indians Conference" },
 ];
 
 
@@ -34,9 +44,32 @@ export default function Navbar() {
   const [search, setSearch] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 16;
+
+  const filteredImages = images.filter((img) =>
+    img.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Pagination logic
+  const indexOfLastImage = currentPage * imagesPerPage;
+  const indexOfFirstImage = indexOfLastImage - imagesPerPage;
+  const currentImages = filteredImages.slice(indexOfFirstImage, indexOfLastImage);
+  const totalPages = Math.ceil(filteredImages.length / imagesPerPage);
+ 
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop + 100 >=
+      document.documentElement.offsetHeight
+    ) {
+      setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+    }
+  };
+
+  
 
   return (
-    <div className="min-h-screen bg-[rgba(240,240,240,1)]-100">
+    <div className="min-h-screen bg-white">
     <nav className="w-full h-[80px] bg-white shadow-md flex items-center px-4 md:px-6 justify-between">
       {/* Left Section: Logo */}
       <div className="flex items-center gap-4">
@@ -89,43 +122,29 @@ export default function Navbar() {
         </button>
       </div>
     </nav>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6">
-      {images
-          .filter((img) => img.title.toLowerCase().includes(search.toLowerCase()))
-          .map((image, index) => (
-            <div
-              key={index}
-              className="bg-white p-4 rounded-lg group transition-all duration-300"
-            >
-              {/* Image Container with Hover Effect */}
+    
+       <div className="">
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {currentImages.map((image, index) => (
+            <div key={index} className="break-inside-avoid bg-white p-4 rounded-lg group transition-all duration-300">
+              {/* Image */}
               <div className="relative rounded-[30px] overflow-hidden">
-                {/* Image */}
-                <img
-                  src={image.src}
-                  alt={image.title}
-                  className="w-full h-70 rounded-[30px] transition-all duration-300 ease-in-out group-hover:brightness-75"
-                />
-
-                {/* Hover Overlay */}
+                <img src={image.src} alt={image.title} className="w-full rounded-[30px] transition-all duration-300 ease-in-out group-hover:brightness-75" />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-between items-end p-4 rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {/* "250 Photos" (Stacked Format - Left Side) */}
                   <div className="text-left">
                     <span className="text-white font-extrabold text-4xl leading-none block">250</span>
                     <span className="text-white font-semibold text-lg block mt-[-5px]">Photos</span>
                   </div>
-                  {/* "2 Nov 2024" (Right Side) */}
                   <span className="text-white text-lg font-medium">2 Nov 2024</span>
                 </div>
               </div>
 
-              {/* Title (Changes Background on Hover) */}
-              <h3
-                className="text-[20px] font-bold tracking-[0.0em] capitalize text-black mt-4 p-2 rounded-md transition-all duration-300 group-hover:text-[rgba(23,6,69,1)]"
-              >
+              {/* Title */}
+              <h3 className="text-[20px] font-bold capitalize text-black mt-4 p-2 rounded-md transition-all duration-300 group-hover:text-[rgba(23,6,69,1)]">
                 {image.title}
               </h3>
 
-              {/* Buttons (Change Background on Hover) */}
+              {/* Buttons */}
               <div className="flex gap-[15px] items-center mt-5">
                 <button className="w-[30px] h-[30px] border border-gray-400 flex items-center justify-center rounded-full transition-all duration-300 group-hover:bg-[rgba(23,6,69,1)] group-hover:text-white">
                   <FiShare size={18} className="text-gray-500 group-hover:text-white" />
@@ -134,12 +153,42 @@ export default function Navbar() {
                   <FiLink size={18} className="text-gray-500 group-hover:text-white" />
                 </button>
                 <button className="w-[30px] h-[30px] border border-gray-400 flex items-center justify-center rounded-full transition-all duration-300 group-hover:bg-[rgba(23,6,69,1)] group-hover:text-white">
-                  <FiDownload size={18} className="text-gray-600 group-hover:text-white" />
+                  <FiDownload size={18} className="text-gray-500 group-hover:text-white" />
                 </button>
               </div>
             </div>
           ))}
-      </div>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+  <div className="flex justify-center mt-6 mb-4 space-x-4">
+    {/* Previous Button */}
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className="px-4 py-2 border rounded-lg bg-[#170645] text-yellow-500"
+    >
+      {"<<"}
+    </button>
+
+    {/* Page Number Display */}
+    <span className="px-4 py-2 border rounded-lg bg-[#170645] text-yellow-500">
+      Page {currentPage} of {totalPages}
+    </span>
+
+    {/* Next Button */}
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+      className="px-4 py-2 border text-sm rounded-lg text-yellow-500 bg-[#170645] "
+    >
+      {">>"}
+    </button>
+  </div>
+)}
+
+        
       {showFilter && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10 p-4">
           <div className="bg-white p-4 sm:p-6 rounded-[30px] shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -262,6 +311,7 @@ export default function Navbar() {
         </div>
       )}
        <Footer />
+    </div>
     </div>
   );
 }

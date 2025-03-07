@@ -1,7 +1,6 @@
-
 "use client";
 import { Poppins } from "next/font/google";
-import { useState, useEffect,  useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 const poppins = Poppins({
@@ -15,10 +14,15 @@ export default function AuthPage() {
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const otpRefs = [useRef(), useRef(), useRef(), useRef()];
+  const [showSignup, setShowSignup] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const handleBackButton = () => {
       setShowOTP(false);
+      setShowSignup(false);
     };
 
     window.addEventListener("popstate", handleBackButton);
@@ -26,13 +30,50 @@ export default function AuthPage() {
   }, []);
 
 
-  const handleSignIn = () => {
-    if (/^\d{10}$/.test(mobile)) {
-      setShowOTP(true);
-      window.history.pushState(null, "", window.location.href);
-    } else {
-      alert("Please enter a valid 10-digit mobile number.");
+  const handleSignUp = () => {
+    let errors = [];
+
+    if (!fullName.trim()) {
+      errors.push("Full Name is required.");
+    } else if (!/^[A-Za-z ]+$/.test(fullName)) {
+      errors.push("Full Name should contain only alphabets.");
     }
+
+    if (!mobile.trim()) {
+      errors.push("Mobile number is required.");
+    } else if (!/^[6-9]\d{9}$/.test(mobile)) {
+      errors.push("Mobile number must be exactly 10 digits and start with 6-9.");
+    }
+
+    if (!email.trim()) {
+      errors.push("Email is required.");
+    } else if (!/^[\w.-]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(email)) {
+      errors.push("Please enter a valid email address.");
+    }
+
+    if (!password.trim()) {
+      errors.push("Password is required.");
+    } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+      errors.push("Password must be at least 8 characters long and include a letter, a number, and a special character.");
+    }
+
+    if (errors.length > 0) {
+      alert(errors.join("\n"));
+      return;
+    }
+    setShowOTP(true);
+  };
+
+  const handleSignIn = () => {
+    if (!mobile) {
+      alert("Mobile number is required.");
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      alert("Please enter a valid 10-digit mobile number starting with 6-9.");
+      return;
+    }
+    setShowOTP(true);
   };
 
   const handleOTPChange = (index, value) => {
@@ -40,7 +81,7 @@ export default function AuthPage() {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      
+
       // Move to the next input field automatically
       if (value && index < otpRefs.length - 1) {
         otpRefs[index + 1].current.focus();
@@ -92,6 +133,36 @@ export default function AuthPage() {
                 Confirm
               </button>
             </div>
+          ) : showSignup ? (
+            <div>
+              <h2 className="text-3xl font-bold text-center text-[#170645]">AI Based CMO Gallery</h2>
+              <p className="text-center text-[#170645] text-lg mt-1">One Click Download</p>
+              <button className="flex items-center justify-center w-full border p-3 mt-4 rounded-lg hover:bg-gray-200">
+                <img src="/google pic.png" alt="Google" className="w-5 mr-2" />
+                <p className="text-[#170645] font-normal">Sign Up With Google</p>
+              </button>
+              <div className="flex items-center my-4">
+                <hr className="flex-grow border-gray-300" />
+                <span className="px-3 text-[#908AA0] text-sm">Or, Sign Up With Your Email</span>
+                <hr className="flex-grow border-gray-300" />
+              </div>
+              <div className="flex gap-2">
+                <input type="text" placeholder="Full Name" value={fullName}
+                  onChange={(e) => setFullName(e.target.value)} className="border w-1/2 p-3 rounded-lg placeholder-[#170645] text-[#170645]" />
+                <input type="text" placeholder="Mobile No." value={mobile} onChange={(e) => setMobile(e.target.value)} className="border w-1/2 p-3 rounded-lg placeholder-[#170645] text-[#170645]" />
+              </div>
+              <input type="email" value={email}
+                onChange={(e) => setEmail(e.target.value)} placeholder="Email Id" className="border w-full p-3 rounded-lg mt-3 placeholder-[#170645] text-[#170645]" />
+              <input type="password" placeholder="Create Your Password" value={password}
+                onChange={(e) => setPassword(e.target.value)} className="border w-full p-3 rounded-lg mt-3 placeholder-[#170645] text-[#170645]" />
+              <button onClick={handleSignUp} className="w-full bg-[#170645] text-[#FFE100] p-3 rounded-lg mt-4 text-lg font-bold">
+                Sign Up
+              </button>
+              <div className="flex justify-center gap-6 mt-4">
+                <button className="text-[#170645] hover:underline text-sm">Customer Support</button>
+                <button className="text-[#170645] hover:underline text-sm">Terms of Service</button>
+              </div>
+            </div>
           ) : (
             <div>
               <h2 className="text-2xl font-bold text-center text-[#170645]">AI Based CMO Gallery</h2>
@@ -115,7 +186,9 @@ export default function AuthPage() {
               <button onClick={handleSignIn} className="w-full bg-[#170645] text-yellow-400 p-2 rounded-full">
                 Sign In
               </button>
-              <p className="text-center text-[#170645] text-sm mt-3">Not Registered Yet? <span className="text-[#170645] font-bold cursor-pointer">Register Now</span></p>
+              <p className="text-center text-[#170645] text-sm mt-3">
+                Not Registered Yet? <span className="text-[#170645] font-bold cursor-pointer" onClick={() => setShowSignup(true)}>Register Now</span>
+              </p>
               <div className="flex justify-center gap-4 mt-4">
                 <button className="text-[#170645] hover:underline">Customer Support</button>
                 <button className="text-[#170645] hover:underline">Terms of Service</button>
@@ -123,25 +196,23 @@ export default function AuthPage() {
             </div>
           )}
         </div>
-        <p className="text-center text-black mt-4">Initiative By DPR Chhattisgarh</p>
+        <p className="text-center text-black ml-[-10px] mt-6">Initiative By DPR Chhattisgarh</p>
       </div>
 
       <div className="hidden md:flex md:w-2/3 relative overflow-hidden items-center">
         <img
           src="/Group 198.png"
           alt="Main Display"
-          className={`absolute w-full max-w-[856px] h-full object-cover top-0 bottom-0 left-1/2 transform -translate-x-1/2 rotate-[-1.32deg] transition-opacity duration-2000 ease-in-out ${
-            showVideoThumbnail ? "opacity-0" : "opacity-100"
-          }`}
+          className={`absolute w-full max-w-[856px] h-full object-cover top-0 bottom-0 left-1/2 transform -translate-x-1/2 rotate-[-1.32deg] transition-opacity duration-2000 ease-in-out ${showVideoThumbnail ? "opacity-0" : "opacity-100"
+            }`}
         />
         <div
-          className={`absolute w-[637px] h-[600px] mix-blend-multiply top-[45px] bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center items-center cursor-pointer transition-opacity duration-2000 ease-in-out ${
-            showVideoThumbnail ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute w-[637px] h-[600px] mix-blend-multiply top-[45px] bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center items-center cursor-pointer transition-opacity duration-2000 ease-in-out ${showVideoThumbnail ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => window.open("/video.mp4", "_blank")}
         >
           <img src="/cmpic.png" alt="Video Thumbnail" className="w-full h-full object-contain" />
-          
+
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
 import { FaRegCalendarAlt } from "react-icons/fa";
 
 export default function UploadPhotoPage() {
